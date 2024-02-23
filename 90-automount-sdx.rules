@@ -1,2 +1,5 @@
 KERNEL=="sd[a-z][0-9]", SUBSYSTEMS=="usb", ACTION=="add", RUN+="/bin/systemctl start automount-sdx@%k.service"
 KERNEL=="sd[a-z][0-9]", SUBSYSTEMS=="usb", ACTION=="remove", RUN+="/bin/systemctl stop automount-sdx@%k.service"
+
+KERNEL=="mmcblk1p[0-9]", ACTION=="add", RUN+="/bin/systemctl start automount-sdx@%k.service"
+KERNEL=="mmcblk1p[0-9]", ACTION=="remove", RUN+="/bin/systemctl stop automount-sdx@%k.service"
