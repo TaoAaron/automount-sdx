@@ -16,6 +16,8 @@ ACTION=$1
 DEVBASE=$2
 DEVICE="/dev/${DEVBASE}"
 
+echo "Warning: DEVICE ${DEVICE} is already mounted at action ${ACTION}}"
+
 # See if this drive is already mounted, and if so where
 MOUNT_POINT=$(/bin/mount | /bin/grep ${DEVICE} | /usr/bin/awk '{ print $3 }')
 
@@ -28,12 +30,12 @@ do_mount() {
     # Get info for this drive: $ID_FS_LABEL, $ID_FS_UUID, and $ID_FS_TYPE
     eval $(/sbin/blkid -o udev ${DEVICE})
 
-    # Figure out a mount point to use
-    LABEL=${ID_FS_PARTUUID}
+    # Figure out a mount point to use   
+    LABEL=${ID_FS_LABEL}
     if [[ -z "${LABEL}" ]]; then
         LABEL=${DEVBASE}
     fi
-    MOUNT_POINT="/mnt/by-partuuid/${LABEL}"
+    MOUNT_POINT="/media/hotplug/${LABEL}"
 
     echo "Mount point: ${MOUNT_POINT}"
 
@@ -68,7 +70,7 @@ do_unmount() {
     # points. This is kind of overkill, but if the drive was unmounted
     # prior to removal we no longer know its mount point, and we don't
     # want to leave it orphaned...
-    for f in /mnt/by-partuuid/*; do
+    for f in /media/hotplug/*; do
         if [[ -n $(/usr/bin/find "$f" -maxdepth 0 -type d -empty) ]]; then
             if ! /bin/grep -q " $f " /etc/mtab; then
                 echo "**** Removing mount point $f"
